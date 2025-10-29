@@ -28,8 +28,7 @@ namespace XTensions
             = ItemSizeType.PhysicalSize)
         {
             // Fail if a volume or file pointer weren't provided.
-            if (volumeOrItem == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume or file pointer provided.");
+            if (volumeOrItem == IntPtr.Zero) throw new ArgumentException("Zero volume or file pointer provided.");
 
             return ImportedMethods.XWF_GetSize(volumeOrItem, sizeType);
         }
@@ -46,8 +45,7 @@ namespace XTensions
             = VolumeNameType.Type1)
         {
             // Fail if a volume pointer wasn't provided.
-            if (volume == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volume == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             // Allocate a buffer to receive the volume name, call the API function and
             // get volume name, and clean up.
@@ -69,8 +67,7 @@ namespace XTensions
         public static VolumeInformation GetVolumeInformation(IntPtr volume)
         {
             // Fail if a volume pointer wasn't provided.
-            if (volume == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volume == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             VolumeInformation info = new VolumeInformation();
 
@@ -83,6 +80,43 @@ namespace XTensions
         }
 
         /// <summary>
+        /// Available in v19.9 SR-7 and later. Retrieves information about the specified volume or item, 
+        /// either through the buffer or the return value, depending on what kind of information you require 
+        /// (nPropType). If through the return value, you may need to cast it to the appropriate type in 
+        /// order to correctly interpret/understand it.
+        /// </summary>
+        /// <param name="evidence">Pointer to volume or item</param>
+        /// <returns>VolumeItemProperties object</returns>
+        /// <remarks>
+        /// Custom.
+        /// NEEDS TESTING.
+        /// </remarks>
+        public static VolumeItemProperties GetProp(IntPtr evidence)
+        {
+            // Fail if an evidence pointer wasn't provided.
+            if (evidence == IntPtr.Zero) throw new ArgumentException(
+                "Zero evidence pointer provided.");
+
+            VolumeItemProperties Properties = new VolumeItemProperties
+            {
+                PSize = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.PSize, IntPtr.Zero),
+                LSize = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.LSize, IntPtr.Zero),
+                DataLength = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.DataLength, IntPtr.Zero),
+                Attr = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.Attr, IntPtr.Zero),
+                Parent = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.Parent, IntPtr.Zero),
+                Window = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.Window, IntPtr.Zero)
+            };
+
+            long tmpPtr = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.Path, IntPtr.Zero);
+            Properties.Path = Marshal.PtrToStringUni((IntPtr)tmpPtr);
+
+            tmpPtr = ImportedMethods.XWF_GetProp(evidence, VolumeItemPropType.PureName, IntPtr.Zero);
+            Properties.PureName = Marshal.PtrToStringUni((IntPtr)tmpPtr);
+
+            return Properties;
+        }
+
+        /// <summary>
         /// Retrieves the boundaries of the currently selected block, if any. A helper 
         /// method for XWF_GetBlock().
         /// </summary>
@@ -92,14 +126,12 @@ namespace XTensions
         public static BlockBoundaries GetBlock(IntPtr volume)
         {
             // Fail if a volume pointer wasn't provided.
-            if (volume == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volume == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             BlockBoundaries Boundaries = new BlockBoundaries();
 
             // Call the API function, getting the block's boundaries.
-            bool Result = ImportedMethods.XWF_GetBlock(volume
-                , out Boundaries.StartOffset, out Boundaries.EndOffset);
+            bool Result = ImportedMethods.XWF_GetBlock(volume, out Boundaries.StartOffset, out Boundaries.EndOffset);
 
             return Boundaries;
         }
@@ -116,12 +148,10 @@ namespace XTensions
         public static bool SetBlock(IntPtr volume, BlockBoundaries boundaries)
         {
             // Fail if a volume pointer wasn't provided.
-            if (volume == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volume == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             // Return results of API call to set the block.
-            return ImportedMethods.XWF_SetBlock(volume, boundaries.StartOffset
-                , boundaries.EndOffset);
+            return ImportedMethods.XWF_SetBlock(volume, boundaries.StartOffset , boundaries.EndOffset);
         }
 
         /// <summary>
@@ -131,8 +161,7 @@ namespace XTensions
         public static void ClearBlock(IntPtr volume)
         {
             // Fail if a volume pointer wasn't provided.
-            if (volume == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volume == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             // Return results of API call to clear the block.
             ImportedMethods.XWF_SetBlock(volume, 0, -1);
@@ -150,8 +179,7 @@ namespace XTensions
             , long sectorNumber)
         {
             // Fail if a volume pointer wasn't provided.
-            if (volume == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volume == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             SectorInformation SectorInformation;
 
@@ -183,8 +211,7 @@ namespace XTensions
             = ItemOpenModes.LogicalContents)
         {
             // Fail if a volume pointer wasn't provided.
-            if (volume == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volume == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             // Catch exception if the item is not able to be opened.  We're going to 
             // output information about the exception and return a zero pointer.
@@ -209,8 +236,7 @@ namespace XTensions
         public static void CloseItem(IntPtr volumeOrItem)
         {
             // Fail if a volume or item pointer weren't provided.
-            if (volumeOrItem == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume or item pointer provided");
+            if (volumeOrItem == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             ImportedMethods.XWF_Close(volumeOrItem);
         }
@@ -227,8 +253,7 @@ namespace XTensions
             , int numberOfBytesToRead = 0)
         {
             // Fail if a volume or item pointer weren't provided.
-            if (volumeOrItem == IntPtr.Zero) throw new ArgumentException(
-                "Zero volume pointer provided.");
+            if (volumeOrItem == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
 
             // Read the full file from the provided offset if the provided number of 
             // bytes to read is 0.
@@ -263,8 +288,7 @@ namespace XTensions
         public static byte[] ReadItem(IntPtr item)
         {
             // Fail if a volume or item pointer weren't provided.
-            if (item == IntPtr.Zero) throw new ArgumentException(
-                "Zero item pointer provided");
+            if (item == IntPtr.Zero) throw new ArgumentException("Zero item pointer provided");
             
             // Get the size of the provided item.
             int Size = (int)GetSize(item, ItemSizeType.PhysicalSize);
@@ -485,23 +509,44 @@ namespace XTensions
             if (evidence == IntPtr.Zero) throw new ArgumentException(
                 "Zero evidence pointer provided.");
 
-            EvidenceObjectProperties Properties = new EvidenceObjectProperties();
+            EvidenceObjectProperties Properties = new EvidenceObjectProperties
+            {
+                // Get the object number.
+                objectNumber = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.EvidenceObjectNumber, IntPtr.Zero),
 
-            // Get the object number.
-            Properties.objectNumber = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.EvidenceObjectNumber, IntPtr.Zero);
+                // Get the object ID.
+                objectID = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.EvidenceObjectID, IntPtr.Zero),
 
-            // Get the object ID.
-            Properties.objectID = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.EvidenceObjectID, IntPtr.Zero);
+                // Get the parent object ID.
+                parentObjectID = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.ParentEvidenceObjectID, IntPtr.Zero),
 
-            // Get the parent object ID.
-            Properties.parentObjectID = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.ParentEvidenceObjectID, IntPtr.Zero);
+                // Get the size in bytes.
+                SizeInBytes = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.SizeInBytes, IntPtr.Zero),
+
+                // Get the volume snapshot file count.
+                VolumeSnapshotFileCount = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.VolumeSnapshotFileCount, IntPtr.Zero),
+
+                // Get the flags.
+                Flags = (EvidenceProperties)ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.Flags, IntPtr.Zero),
+
+                // Get the file system identifier.
+                FileSystemIdentifier = (VolumeFileSystem)ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.FileSystemIdentifier, IntPtr.Zero),
+
+                // Get the hash type.
+                HashType = (HashType)ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.HashType, IntPtr.Zero),
+
+                // Get the creation time.
+                CreationTime = DateTime.FromFileTime(ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.CreationTime, IntPtr.Zero)),
+
+                // Get the modification time.
+                ModificationTime = DateTime.FromFileTime(ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.ModificationTime, IntPtr.Zero)),
+
+                // Get the hash 2 type.
+                HashType2 = (HashType)ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.HashType2, IntPtr.Zero)
+            };
 
             // Get the title.
-            long tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.Title, IntPtr.Zero);
+            long tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.Title, IntPtr.Zero);
             Properties.title = Marshal.PtrToStringUni((IntPtr)tmpPtr);
 
             // Initialize the buffer for later use.
@@ -509,68 +554,39 @@ namespace XTensions
 
             // Get the extended title.
             IntPtr bufferPtr = Marshal.AllocHGlobal(bufferSize);
-            bufferPtr = Marshal.AllocHGlobal(bufferSize);
-            ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.ExtendedTitle, bufferPtr);
+            ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.ExtendedTitle, bufferPtr);
             Properties.extendedTitle = Marshal.PtrToStringUni(bufferPtr);
             Marshal.FreeHGlobal(bufferPtr);
 
             // Get the abbreviated title.
             bufferPtr = Marshal.AllocHGlobal(bufferSize);
-            ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.AbbreviatedTitle, bufferPtr);
+            ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.AbbreviatedTitle, bufferPtr);
             Properties.abbreviatedTitle = Marshal.PtrToStringUni(bufferPtr);
             Marshal.FreeHGlobal(bufferPtr);
 
             // Get the internal name.
-            tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.InternalName, IntPtr.Zero);
+            tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.InternalName, IntPtr.Zero);
             Properties.internalName = Marshal.PtrToStringUni((IntPtr)tmpPtr);
 
             // Get the description.
-            tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.Description, IntPtr.Zero);
+            tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.Description, IntPtr.Zero);
             Properties.description = Marshal.PtrToStringUni((IntPtr)tmpPtr);
 
             // Get the examiner comments.
-            tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.ExaminerComments, IntPtr.Zero);
+            tmpPtr = ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.ExaminerComments, IntPtr.Zero);
             Properties.examinerComments = Marshal.PtrToStringUni((IntPtr)tmpPtr);
 
             // Get the internally used directory.
             bufferPtr = Marshal.AllocHGlobal(bufferSize);
-            ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.InternallyUsedDirectory, bufferPtr);
+            ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.InternallyUsedDirectory, bufferPtr);
             Properties.internallyUsedDirectory = Marshal.PtrToStringUni(bufferPtr);
             Marshal.FreeHGlobal(bufferPtr);
 
             // Get the output directory.
             bufferPtr = Marshal.AllocHGlobal(bufferSize);
-            ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.OutputDirectory, bufferPtr);
+            ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.OutputDirectory, bufferPtr);
             Properties.outputDirectory = Marshal.PtrToStringUni(bufferPtr);
             Marshal.FreeHGlobal(bufferPtr);
-
-            // Get the size in bytes.
-            Properties.SizeInBytes = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.SizeInBytes, IntPtr.Zero);
-
-            // Get the volume snapshot file count.
-            Properties.VolumeSnapshotFileCount = ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.VolumeSnapshotFileCount, IntPtr.Zero);
-
-            // Get the flags.
-            Properties.Flags = (EvidenceProperties)ImportedMethods.XWF_GetEvObjProp(
-                evidence, EvidencePropertyType.Flags, IntPtr.Zero);
-
-            // Get the file system identifier.
-            Properties.FileSystemIdentifier
-                = (VolumeFileSystem)ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.FileSystemIdentifier, IntPtr.Zero);
-
-            // Get the hash type.
-            Properties.HashType = (HashType)ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.HashType, IntPtr.Zero);
 
             // Get the hash value.
             if (Properties.HashType == HashType.Undefined)
@@ -580,27 +596,12 @@ namespace XTensions
             else
             {
                 bufferPtr = Marshal.AllocHGlobal(bufferSize);
-                int hashSize = (int)ImportedMethods.XWF_GetEvObjProp(evidence
-                    , EvidencePropertyType.HashValue, bufferPtr);
+                int hashSize = (int)ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.HashValue, bufferPtr);
                 Byte[] hash1 = new Byte[hashSize];
                 Marshal.Copy(bufferPtr, hash1, 0, hashSize);
                 Properties.HashValue = hash1;
                 Marshal.FreeHGlobal(bufferPtr);
             }
-
-            // Get the creation time.
-            Properties.CreationTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.CreationTime, IntPtr.Zero));
-
-            // Get the modification time.
-            Properties.ModificationTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetEvObjProp(evidence
-                    , EvidencePropertyType.ModificationTime, IntPtr.Zero));
-
-            // Get the hash 2 type.
-            Properties.HashType2 = (HashType)ImportedMethods.XWF_GetEvObjProp(evidence
-                , EvidencePropertyType.HashType2, IntPtr.Zero);
 
             // Get the hash 2 value.
             if (Properties.HashType2 == HashType.Undefined)
@@ -610,8 +611,7 @@ namespace XTensions
             else
             {
                 bufferPtr = Marshal.AllocHGlobal(bufferSize);
-                int hashSize = (int)ImportedMethods.XWF_GetEvObjProp(evidence
-                    , EvidencePropertyType.HashValue2, bufferPtr);
+                int hashSize = (int)ImportedMethods.XWF_GetEvObjProp(evidence, EvidencePropertyType.HashValue2, bufferPtr);
                 Byte[] hash2 = new Byte[hashSize];
                 Marshal.Copy(bufferPtr, hash2, 0, hashSize);
                 Properties.HashValue2 = hash2;
@@ -690,13 +690,9 @@ namespace XTensions
         /// - Todo: Need to test the output and build an array of items returned.
         /// - Todo: Need to figure out what the flags are used for.
         /// </remarks>
-        public static IntPtr GetEvidenceObjectReportTableAssociations(IntPtr evidence
-            , uint options = 0x01)
+        public static IntPtr GetEvidenceObjectReportTableAssociations(IntPtr evidence, uint options = 0x01)
         {
-            IntPtr Value;
-            IntPtr associationList = ImportedMethods.XWF_GetEvObjReportTableAssocs(
-                evidence, options, out Value);
-
+            IntPtr associationList = ImportedMethods.XWF_GetEvObjReportTableAssocs(evidence, options, out IntPtr Value);
             return Value;
         }
 
@@ -726,40 +722,34 @@ namespace XTensions
         /// <remarks>Version 1.0 coding complete.</remarks>
         public static VolumeSnapshotProperties GetVolumeSnapshotProperties()
         {
-            VolumeSnapshotProperties Properties = new VolumeSnapshotProperties();
+            VolumeSnapshotProperties Properties = new VolumeSnapshotProperties
+            {
 
-            // Get the root directory.
-            Properties.rootDirectory = ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.SpecialItemID
-                , SpecialItemType.RootDirectory);
-            // Get the "Path Unknown" directory.
-            Properties.pathUnknownDirectory = ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.SpecialItemID
-                , SpecialItemType.PathUnknownDirectory);
-            // Get the "Carved Files" directory.
-            Properties.carvedFilesDirectory = ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.SpecialItemID
-                , SpecialItemType.CarvedFilesDirectory);
-            // Get the free space file.
-            Properties.freeSpaceFile = ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.SpecialItemID
-                , SpecialItemType.FreeSpaceFile);
-            // Get the "System Volume Information" directory.
-            Properties.systemVolumeInformationDirectory = ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.SpecialItemID
-                , SpecialItemType.SystemVolumeInformationDirectory);
-            // Get the Windows EDB file.
-            Properties.windowsEDBFile = ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.SpecialItemID
-                , SpecialItemType.WindowsEDBFile);
-            // Get the first hash.
-            Properties.hashType1 = (HashType)ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.HashType1
-                , SpecialItemType.Ununsed);
-            // Get the second hash.
-            Properties.hashType2 = (HashType)ImportedMethods.XWF_GetVSProp(
-                VolumeSnapshotPropertyType.HashType2
-                , SpecialItemType.Ununsed);
+                // Get the root directory.
+                rootDirectory = ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.SpecialItemID, SpecialItemType.RootDirectory),
+                // Get the "Path Unknown" directory.
+                pathUnknownDirectory = ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.SpecialItemID, SpecialItemType.PathUnknownDirectory),
+                // Get the "Carved Files" directory.
+                carvedFilesDirectory = ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.SpecialItemID, SpecialItemType.CarvedFilesDirectory),
+                // Get the free space file.
+                freeSpaceFile = ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.SpecialItemID, SpecialItemType.FreeSpaceFile),
+                // Get the "System Volume Information" directory.
+                systemVolumeInformationDirectory = ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.SpecialItemID, SpecialItemType.SystemVolumeInformationDirectory),
+                // Get the Windows EDB file.
+                windowsEDBFile = ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.SpecialItemID, SpecialItemType.WindowsEDBFile),
+                // Get the first hash.
+                hashType1 = (HashType)ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.HashType1, SpecialItemType.Ununsed),
+                // Get the second hash.
+                hashType2 = (HashType)ImportedMethods.XWF_GetVSProp(
+                VolumeSnapshotPropertyType.HashType2, SpecialItemType.Ununsed)
+            };
 
             return Properties;
         }
@@ -854,6 +844,34 @@ namespace XTensions
 
             return ImportedMethods.XWF_CreateFile(fileName, options, parentItemId
                 , sourceInformation);
+        }
+
+        // custom
+        /// <summary>
+        /// Searches for a file or directory with the specified name with the specified parent 
+        /// (e.g. directory or file with child objects) in the current volume snapshot. 
+        /// Returns the ID of the first matching item if -1 if no match was found. 
+        /// nSearchStartItemID should be 0 for a search from the start of the volume snapshot. 
+        /// If after receiving one match you wish to search for another match, 
+        /// for example because you are looking for an existing file, 
+        /// but the first match is for a previously existing file in that directory, 
+        /// you can call this function again with the previously returns item ID + 1.
+        /// A helper method for XWF_FindItem1().
+        /// </summary>
+        /// <param name="parentItemId">Specified parent id.</param>
+        /// <param name="fileName">Filename to look for.</param>
+        /// <param name="options">Find item flags (FindItemOptions)</param>
+        /// <param name="searchStartItemId">If looking for next.</param>
+        /// <returns>Returns item id.</returns>
+        /// <remarks>Needs testing</remarks>
+        public static int FindItem1(int parentItemId, string fileName,
+            FindItemOptions options = FindItemOptions.Unused, int searchStartItemId = 0)
+        {
+            // Fail if no item name provided.
+            if (fileName == null || fileName == "") throw new ArgumentException(
+                "Must provide a file name.");
+
+            return ImportedMethods.XWF_FindItem1(parentItemId, fileName, options, searchStartItemId);
         }
 
         /// <summary>
@@ -962,10 +980,9 @@ namespace XTensions
             if (itemId < -1) throw new ArgumentException(
                 "Invalid item Id provided.");
 
-            long ItemOffset, StartSector;
             ItemOffsets ItemOffsets = new ItemOffsets();
 
-            ImportedMethods.XWF_GetItemOfs(itemId, out ItemOffset, out StartSector);
+            ImportedMethods.XWF_GetItemOfs(itemId, out long ItemOffset, out long StartSector);
 
             // If positive, ItemOffset is a file system offset.
             if (ItemOffset >= 0)
@@ -1034,79 +1051,62 @@ namespace XTensions
             if (itemId < 0)
                 throw new ArgumentException("Invalid item Id provided.");
 
-            ItemInformation Information = new ItemInformation();
-            bool Status;
+            ItemInformation Information = new ItemInformation
+            {
+                // Get the original Id.
+                originalItemID = ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.OriginalId, out bool Status),
 
-            // Get the original Id.
-            Information.originalItemID = ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.OriginalId, out Status);
+                // Get the attributes.
+                attributes = ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.Attributes, out Status),
 
-            // Get the attributes.
-            Information.attributes = ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.Attributes, out Status);
+                // Get the flags.
+                options = (ItemInformationOptions)
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.Options, out Status),
 
-            // Get the flags.
-            Information.options = (ItemInformationOptions)
-                ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.Options, out Status);
+                // Get the deletion information.
+                deletionStatus = (ItemDeletionStatus)
+                ImportedMethods.XWF_GetItemInformation(itemId , ItemInformationType.DeletionStatus, out Status),
 
-            // Get the deletion information.
-            Information.deletionStatus = (ItemDeletionStatus)
-                ImportedMethods.XWF_GetItemInformation(itemId
-                    , ItemInformationType.DeletionStatus, out Status);
+                // Get the classification.
+                classification = (ItemClassifiction)
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.Classification, out Status),
 
-            // Get the classification.
-            Information.classification = (ItemClassifiction)
-                ImportedMethods.XWF_GetItemInformation(itemId
-                    , ItemInformationType.Classification, out Status);
+                // Get the link count.
+                linkCount = ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.LinkCount, out Status),
 
-            // Get the link count.
-            Information.linkCount = ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.LinkCount, out Status);
+                // Get the color analysis.
+                colorAnalysis = ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.ColorAnalysis, out Status),
 
-            // Get the color analysis.
-            Information.colorAnalysis = ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.ColorAnalysis, out Status);
+                // Get the file count.
+                fileCount = ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.FileCount, out Status),
 
-            // Get the file count.
-            Information.fileCount = ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.FileCount, out Status);
+                // Get the embedded offset.
+                embeddedOffset = ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.EmbeddedOffset, out Status),
 
-            // Get the embedded offset.
-            Information.embeddedOffset = ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.EmbeddedOffset, out Status);
+                // Get the creation time.
+                creationTime = DateTime.FromFileTime(
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.CreationTime, out Status)),
 
-            // Get the creation time.
-            Information.creationTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.CreationTime, out Status));
+                // Get the modification time.
+                modificationTime = DateTime.FromFileTime(
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.ModificationTime, out Status)),
 
-            // Get the modification time.
-            Information.modificationTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.ModificationTime, out Status));
+                // Get the last access time.
+                lastAccessTime = DateTime.FromFileTime(
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.LastAccessTime, out Status)),
 
-            // Get the last access time.
-            Information.lastAccessTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.LastAccessTime, out Status));
+                // Get the entry modification time.
+                entryModificationTime = DateTime.FromFileTime(
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.EntryModificationTime, out Status)),
 
-            // Get the entry modification time.
-            Information.entryModificationTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.EntryModificationTime
-                , out Status));
+                // Get the deletion time.
+                deletionTime = DateTime.FromFileTime(
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.DeletionTime, out Status)),
 
-            // Get the deletion time.
-            Information.deletionTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.DeletionTime, out Status));
-
-            // Get the internal creation time.
-            Information.internalCreationTime = DateTime.FromFileTime(
-                ImportedMethods.XWF_GetItemInformation(itemId
-                , ItemInformationType.InternalCreationTime
-                , out Status));
+                // Get the internal creation time.
+                internalCreationTime = DateTime.FromFileTime(
+                ImportedMethods.XWF_GetItemInformation(itemId, ItemInformationType.InternalCreationTime, out Status))
+            };
 
             return Information;
         }
@@ -1425,7 +1425,7 @@ namespace XTensions
             else
                 Marshal.WriteByte(Buffer, 0, 0);
 
-            if (hashNum == HashNumber.FirstPhotoDNA || 
+            if (hashNum == HashNumber.FirstPhotoDNA ||
                 hashNum == HashNumber.SecondPhotoDNA ||
                 hashNum == HashNumber.ThirdPhotoDNA)
             {
@@ -1508,6 +1508,51 @@ namespace XTensions
             return ImportedMethods.XWF_GetMetadataEx(item, options);
         }
 
+        // custom
+        /// <summary>
+        /// Available in v20.3 and later. Prepares X-Ways Forensics for calls of XWF_GetText(), 
+        /// which may be necessary depending on whether similar functionality has already been used 
+        /// in the GUI during the current session or not. Does not override the user's decision 
+        /// to not use the viewer component or OCR in general. 
+        /// </summary>
+        /// <param name="textDecode">0x01 means that text decoding should be prepared. 
+        /// You don't need to specify this flag if you are interested in only OCR.</param>
+        public static void PrepareTextAccess(PrepareTextAccess option)
+        {
+            ImportedMethods.XWF_PrepareTextAccess((uint)option, null);
+        }
+
+        // custom - needs testing - nResult check fails, get content works
+        /// <summary>
+        /// Available in v20.3 and later. Can extract pure text from files of various types, 
+        /// using means including OCR if OCR functionality is available in X-Ways Forensics, 
+        /// as known from the Text submode of Preview mode in the GUI. How spreadsheets are 
+        /// processed depends on the options in Options | Viewer Programs. 
+        /// </summary>
+        /// <param name="hItem">the file from which to extract text.</param>
+        /// <returns>If successful, the function returns a pointer to a buffer that you eventually 
+        /// need to release with XWF_ReleaseMem(). The buffer contains text usually in UTF-16.</returns>
+        public static string GetText(IntPtr hItem, GetTextOptions nFlags)
+        {
+            // Fail if a volume or item pointer weren't provided.
+            if (hItem == IntPtr.Zero) throw new ArgumentException("Zero volume pointer provided.");
+
+            IntPtr lpnResult = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(uint)));
+            string content = "ERROR - unable to read file content";
+
+            IntPtr buffer = ImportedMethods.XWF_GetText(hItem, (uint)nFlags, lpnResult, default, default);
+
+            /*var nResult = Marshal.PtrToStringAuto(lpnResult);   // returns UTF-16 string, not uint -> is always \u0011 (makes no sense)
+            if ((int)nResult > 0)
+            {
+                content = Marshal.PtrToStringAuto(buffer);
+            }*/
+
+            content = Marshal.PtrToStringAuto(buffer);
+            ReleaseMemory(buffer);
+            return content;
+        }
+
         /// <summary>
         /// Provides a standardized true-color RGB raster image representation for any 
         /// picture file type that is supported internally in X-Ways Forensics (e.g. 
@@ -1557,12 +1602,13 @@ namespace XTensions
         public static SearchInformation CreateSearchInfo(string searchTerms
             , SearchInformationOptions searchOptions)
         {
-            SearchInformation Info = new SearchInformation();
-
-            Info.volume = IntPtr.Zero; //the docs say that hVolume should be 0
-            Info.searchTerms = searchTerms;
-            Info.searchOptions = searchOptions;
-            Info.searchWindowLength = 0;
+            SearchInformation Info = new SearchInformation
+            {
+                volume = IntPtr.Zero, //the docs say that hVolume should be 0
+                searchTerms = searchTerms,
+                searchOptions = searchOptions,
+                searchWindowLength = 0
+            };
             Info.packedRecordSize = Marshal.SizeOf(Info);
             return Info;
         }
@@ -1797,27 +1843,41 @@ namespace XTensions
         /// </param>
         /// <param name="options">User input options.</param>
         /// <returns></returns>
-        /// <remarks>Needs testing.</remarks>
+        /// <remarks>Adjusted. Needs testing.</remarks>
         public static string GetUserInput(string message, string suggestedInput = null,
             UserInputOptions options = UserInputOptions.Unused)
         {
             // Fail if a null string message is provided.
-            if (message == null) throw new ArgumentException(
-                "Null string provided");
+            if (message == null) throw new ArgumentException("Null string provided");
 
             // Allocate a buffer to receive the user input
             IntPtr Buffer = Marshal.AllocHGlobal((int)_userInputLength);
 
             // If caller has provided suggest input, put it in the buffer.
+            // This means that only <= amount of characters as suggested input is allowed for input
+            char c = '\0';
             if (suggestedInput != null)
             {
+                int extra = (int)_userInputLength - suggestedInput.Length;
+                suggestedInput += new string(c, extra);
                 Buffer = Marshal.StringToHGlobalUni(suggestedInput);
             }
 
             // Call the API function and get the user input, and clean up.
-            long InputLength = ImportedMethods.XWF_GetUserInput(message, Buffer, 
+            long InputLength = ImportedMethods.XWF_GetUserInput(message, Buffer,
                 _userInputLength, options);
-            string UserInput = Marshal.PtrToStringUni(Buffer, (int) InputLength);
+            // return for when cancel button was clicked - is checked later in main code
+            if (InputLength == -1)
+            {
+                //remove input (pwd) from buffer
+                Buffer = Marshal.StringToHGlobalUni(new string(c, (int)_userInputLength));
+                Marshal.FreeHGlobal(Buffer);
+                return "Clicked cancel";
+            }
+            string UserInput = Marshal.PtrToStringUni(Buffer, (int)InputLength);
+
+            //remove input (pwd) from buffer
+            Buffer = Marshal.StringToHGlobalUni(new string(c, (int)_userInputLength));
             Marshal.FreeHGlobal(Buffer);
 
             return UserInput;

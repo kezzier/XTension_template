@@ -9,8 +9,9 @@ namespace XTensions
     public static class ImportedMethods
     {
 
-        // The following delegates are used to call the X-Tension API methods. Those
-        // commented out are not yet implemented.
+        // The following delegates are used to call the X-Tension API methods. 
+        // Those commented out are not yet implemented.
+
         public delegate long XWFGetSizeDelegate(IntPtr hVolumeOrItem
             , ItemSizeType lpOptional);
         public static XWFGetSizeDelegate XWF_GetSize;
@@ -24,6 +25,11 @@ namespace XTensions
             , out uint nSectorsPerCluster, out long nClusterCount
             , out long nFirstClusterSectorNo);
         public static XWFGetVolumeInformationDelegate XWF_GetVolumeInformation;
+
+        //custom
+        public delegate long XWFGetPropDelegate(IntPtr hVolumeOrItem
+            , VolumeItemPropType nPropType, IntPtr lpString);
+        public static XWFGetPropDelegate XWF_GetProp;
 
         public delegate bool XWFGetBlockDelegate(IntPtr hVolume, out long lpStartOfs
             , out long lpEndOfs);
@@ -142,6 +148,13 @@ namespace XTensions
             , IntPtr pSourceInfo);
         public static XWFCreateFileDelegate XWF_CreateFile;
 
+        // custom
+        public delegate int XWFFindItem1Delegate(
+            long nParentItemID,
+            [MarshalAs(UnmanagedType.LPWStr)] string lpName,
+            FindItemOptions nFindFlags, long nSearchStartItemID);
+        public static XWFFindItem1Delegate XWF_FindItem1;
+
         /*
         [return: MarshalAs(UnmanagedType.LPWStr)]
         public delegate string XWFGetItemNameDelegate(int itemID);
@@ -249,6 +262,14 @@ namespace XTensions
 
         public delegate IntPtr XWFGetMetadataExDelegate(IntPtr hItem, uint lpnFlags);
         public static XWFGetMetadataExDelegate XWF_GetMetadataEx;
+
+        // custom
+        public delegate uint XWFPrepareTextAccessDelegate(uint nFlags, string lpLangs);
+        public static XWFPrepareTextAccessDelegate XWF_PrepareTextAccess;
+
+        // custom
+        public delegate IntPtr XWFGetTextDelegate(IntPtr hItem, uint nFlags, IntPtr lpnResult, uint lpnBufUsedSize, uint lpnBufAllocSize);
+        public static XWFGetTextDelegate XWF_GetText;
 
         public delegate IntPtr XWFGetRasterImageDelegate(
             ref RasterImageInformation RIInfo);
@@ -391,6 +412,10 @@ namespace XTensions
                     = GetMethodDelegate<XWFGetVolumeInformationDelegate>(
                     moduleHandle, "XWF_GetVolumeInformation");
 
+                XWF_GetProp
+                   = GetMethodDelegate<XWFGetPropDelegate>(
+                   moduleHandle, "XWF_GetProp");
+
                 XWF_GetBlock = GetMethodDelegate<XWFGetBlockDelegate>(
                     moduleHandle, "XWF_GetBlock");
 
@@ -488,6 +513,10 @@ namespace XTensions
                 XWF_CreateFile = GetMethodDelegate<XWFCreateFileDelegate>(
                     moduleHandle, "XWF_CreateFile");
 
+                // custom
+                XWF_FindItem1 = GetMethodDelegate<XWFFindItem1Delegate>(
+                    moduleHandle, "XWF_FindItem1");
+
                 XWF_GetItemName = GetMethodDelegate<XWFGetItemNameDelegate>(
                     moduleHandle, "XWF_GetItemName");
 
@@ -570,6 +599,14 @@ namespace XTensions
 
                 XWF_GetMetadataEx = GetMethodDelegate < XWFGetMetadataExDelegate>(
                     moduleHandle, "XWF_GetMetadataEx");
+
+                // custom
+                XWF_PrepareTextAccess = GetMethodDelegate<XWFPrepareTextAccessDelegate>(
+                    moduleHandle, "XWF_PrepareTextAccess");
+
+                // custom
+                XWF_GetText = GetMethodDelegate<XWFGetTextDelegate>(
+                    moduleHandle, "XWF_GetText");
 
                 XWF_GetRasterImage = GetMethodDelegate<XWFGetRasterImageDelegate>(
                     moduleHandle, "XWF_GetRasterImage");

@@ -178,6 +178,15 @@ namespace XTensions
         MoreItemsExpected = 0x00000001u
     }
 
+    // custom
+    [Flags]
+    public enum FindItemOptions : uint
+    {
+        Unused = 0,
+        /// <summary>Match case, for performance reasons</summary>
+        MatchCase = 0x00000001u
+    }
+
     /// <summary>
     /// Evidence object type.
     /// </summary>
@@ -443,7 +452,9 @@ namespace XTensions
         PreviouslyExistingPossiblyRecoverable = 1u,
         PreviouslyExistingFirstClusterOverwrittenOrUnknown = 2u,
         RenamedOrMovedPossiblyRecoverable = 3u,
-        RenamedOrMovedFirstClusterOverwrittenOrUknown = 4u
+        RenamedOrMovedFirstClusterOverwrittenOrUknown = 4u,
+        // since v19.3 SR-3, used to be 1
+        Carved = 5u
     }
 
     [Flags]
@@ -846,6 +857,7 @@ namespace XTensions
     /// </summary>
     public enum VolumeFileSystem : int
     {
+        APFS = 12,
         MainMemory = 9,
         CDFS = 8,
         ViaOS = 7,
@@ -883,6 +895,47 @@ namespace XTensions
         Type2 = 2u,
         /// <summary>Type 3</summary>
         Type3 = 3u
+    }
+
+    /// <summary>
+    /// Custom
+    /// v19.9 SR-7 and later.
+    /// </summary>
+    public enum VolumeItemPropType : int
+    {
+        /// <summary>physical size of a file or volume or disk</summary>
+        PSize = 0,
+        /// <summary>logical size of a file</summary>
+        LSize = 1,
+        /// <summary>valid data length of a file (a.k.a. initialized size of the data 
+        /// stream, which may be available from NTFS, exFAT, XWFS, XWFS2)</summary>
+        DataLength = 2,
+        /// <summary>attributes of a file</summary>
+        Attr = 4,
+        /// <summary>pointer to the file path, if available, or just name</summary>
+        Path = 8,
+        /// <summary>pointer to the pure name</summary>
+        PureName = 9,
+        /// <summary>parent volume of a file</summary>
+        Parent = 10,
+        /// <summary>the 1-based number of the data window that shows the specified 
+        /// volume or file, can be 0 in unusual cases to indicate an error</summary>
+        Window = 16
+    }
+
+    //custom
+    public struct VolumeItemProperties
+    {
+        public long PSize;
+        public long LSize;
+        public long DataLength;
+        public long Attr;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Path;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string PureName;
+        public long Parent;
+        public long Window;
     }
 
     /// <summary>
@@ -1220,5 +1273,46 @@ namespace XTensions
         public long windowsEDBFile;
         public HashType hashType1;
         public HashType hashType2;
+    }
+
+    // custom
+    public enum PrepareTextAccess : uint
+    {
+        /// <summary>only OCR is used, no text decoding preformed</summary>
+        OCRonly = 0,
+        /// <summary>text decoding should be prepared</summary>
+        DecodeText = 0x01
+    }
+
+    // custom
+    public enum GetTextOptions : uint
+    {
+        /// <summary>decode text in files that have textual contents</summary>
+        DecodeText = 0x00000001u,
+        /// <summary>recognize text in files with graphical contents (OCR)</summary>
+        OCR = 0x00000002u,
+        /// <summary>retrieve text as 8-bit ASCII or Latin 1 instead of UTF-16 if no contained characters require UTF-16</summary>
+        ASCIIloss = 0x00000010u,
+        /// <summary>retrieve text as 8-bit ASCII or Latin 1 instead of UTF-16 even if characters are lost that way</summary>
+        ASCIInoloss = 0x00000020u
+    }
+
+    // custom - unused
+    public enum GetTextResult : int
+    {
+        /// <summary>success, pointer to buffer with UTF-16 returned</summary>
+        UTF16 = 0x01,
+        /// <summary>success, pointer to buffer with 8-bit ASCII/Latin 1 returned</summary>
+        ASCII = 0x02,
+        /// <summary>success, text derived through OCR</summary>
+        OCR = 0x10,
+        /// <summary>no buffer available, no textual content found</summary>
+        NoContent = 0,
+        /// <summary>no buffer available, file seems encrypted</summary>
+        Encrypted = -1,
+        /// <summary>no buffer available, action aborted</summary>
+        Abort = -2,
+        /// <summary>no buffer available, error occurred</summary>
+        Error = -3
     }
 }
