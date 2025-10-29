@@ -60,12 +60,7 @@ namespace XTensions
         [DllExport]
         public static long XT_ProcessItemEx(int nItemID, IntPtr hItem, IntPtr lpReserved)
         {
-            // update progress bar
-            if (HelperMethods.ShouldStop())
-            {
-                HelperMethods.OutputMessage("Stopping X-Tension");
-                return -1;
-            }
+            if (CommonMethods.ShouldStop() == -1) return -1;
 
             return 0;
         }

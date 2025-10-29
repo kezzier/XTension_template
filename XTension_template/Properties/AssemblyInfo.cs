@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("XTension_template")]
-[assembly: AssemblyCopyright("Copyright ©  2020-2023")]
+[assembly: AssemblyCopyright("Kezzie R. 2020-2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

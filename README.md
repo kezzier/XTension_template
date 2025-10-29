@@ -7,3 +7,5 @@ Changed buffer use in some HelperMethods.
 Added API HelperMethods: FindItem1, PrepareTextAccess, GetText.
 
 Added ImportMethods and DataTypes for HelperMethods mentioned above.
+
+Added commonly used methods.
