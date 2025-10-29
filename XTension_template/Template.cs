@@ -84,10 +84,5 @@ namespace XTensions
             else HelperMethods.OutputMessage("[XT] Dll loaded!");
             return 0;
         }
-
-        ///////////////////////////////////////////////////////////////
-        /// custom methods
-        /// 
-
     }
 }
