@@ -1,11 +1,21 @@
 # XTension_template
 
-Based on: https://github.com/jp-slackspace/x-tension-c-sharp
+C# template for X-Ways X-Tensions.
 
-Changed buffer use in some HelperMethods.
+Based on [jp-slackspace's x-tension-c-sharp](https://github.com/jp-slackspace/x-tension-c-sharp).
 
-Added API HelperMethods: FindItem1, PrepareTextAccess, GetText.
+## Changes
 
-Added ImportMethods and DataTypes for HelperMethods mentioned above.
+- Optimised buffer use in some HelperMethods.
 
-Added commonly used methods.
+## Additions
+
+- Added API HelperMethods: FindItem1, PrepareTextAccess, GetText.
+
+- Added ImportMethods and DataTypes for HelperMethods mentioned above.
+
+- Added commonly used methods.
+
+## Troubleshooting
+
+If you get building errors for the DllExport assembly, install [.NET 3.5](https://www.microsoft.com/en-us/download/details.aspx?id=21) and [Microsoft Build Tools 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48159).
